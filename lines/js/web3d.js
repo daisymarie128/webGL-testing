@@ -25,8 +25,6 @@ function init() {
   camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 0.1, 20000);
   //.PerspectiveCamera (zoom, )
   camera.position.set(0,20,0);
-  camera.up = new THREE.Vector3(0,2,1);
-  camera.lookAt(new THREE.Vector3(100,0,10));
   scene.add(camera);
 
   // Create an event listener that resizes the renderer with the browser window.
@@ -73,18 +71,20 @@ function init() {
 
 }
 
+// Vertices builder x,y,z where y amplitude passed in from frequency
+var verticesFactory = function(x, y) {
+  var vertex = new THREE.Vector3(x, y, 0)
+  return vertex;
+}
 
-var lineFactory = function(r, g, b) {
+var lineFactory = function(r, g, b, vertexArray) {
   var lineMaterial = new THREE.LineBasicMaterial({
     // color: "rgb("+r+","+g+","+b+")"
     color: "rgb("+r+","+g+","+b+")"
   });
 
   var lineGeometry = new THREE.Geometry();
-  lineGeometry.vertices.push(
-    new THREE.Vector3( 0, 0, 0 ),
-    new THREE.Vector3( 10, 0, 0 )
-  );
+  lineGeometry.vertices = vertexArray;
 
   var line = new THREE.Line( lineGeometry, lineMaterial );
   scene.add( line );
@@ -108,7 +108,7 @@ function animate() {
     line.position.z += 0.1;
   }
 
-  if(lines.length > 3){
+  if(lines.length > 50){
     lastLine = lines.shift();
     scene.remove(lastLine);
   }
@@ -122,5 +122,17 @@ function random0255() {
 init();
 animate();
 
-var timer = setInterval(function(){lineFactory(random0255(), random0255(), random0255())},100)
+var timer = setInterval(function(){
+    //lineFactory build at intervals
+    var freqPoints = [];
+    var freqArray = getFrequencies();
+    // Get data and build vertices
+    for (var i = 0; i < freqArray.length; i++) {
+      var amplitude = freqArray[i]/50;
+      var freqPoint = verticesFactory(i, amplitude);
+      freqPoints.push(freqPoint)
+    }
+    lineFactory(random0255(), random0255(), random0255(), freqPoints);
+  },
+  1);
 setTimeout(function(){clearInterval(timer)}, 10000);
