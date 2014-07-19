@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Treehouse Logo in three.js</title>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <meta charset="utf-8">
+</head>
+<body style="margin: 0;">
+
+  <script src="js/three.min.js"></script>
+  <script src="js/OrbitControls.js"></script>
+
+  <script>
+
+    // Set up the scene, camera, and renderer as global variables.
+    var scene, camera, renderer;
+    var v5;
+    init();
+    animate();
+
+    // Sets up the scene.
+    function init() {
+
+      // Create the scene and set the scene size.
+      scene = new THREE.Scene();
+      var WIDTH = window.innerWidth,
+          HEIGHT = window.innerHeight;
+      var mesh;
+      // Create a renderer and add it to the DOM.
+      renderer = new THREE.WebGLRenderer({antialias:true});
+      renderer.setSize(WIDTH, HEIGHT);
+      document.body.appendChild(renderer.domElement);
+
+      // Create a camera, zoom it out from the model a bit, and add it to the scene. .PerspectiveCamera (Feild of view, Aspect Ratio
+      // .. Near(start rendering), Far (vanishing point? horizon line?))
+      camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 0.1, 20000);
+      //.PerspectiveCamera (zoom, )
+      camera.position.set(0,20,0);
+      scene.add(camera);
+
+      // Create an event listener that resizes the renderer with the browser window.
+      window.addEventListener('resize', function() {
+        var WIDTH = window.innerWidth,
+            HEIGHT = window.innerHeight;
+        renderer.setSize(WIDTH, HEIGHT);
+        camera.aspect = WIDTH / HEIGHT;
+        camera.updateProjectionMatrix();
+      });
+
+      // Set the background color of the scene.
+      renderer.setClearColorHex(0x333F47, 1);
+
+      // Create a light, set its position, and add it to the scene.
+      var light = new THREE.PointLight(0xfffff);
+      light.position.set(-100,200,100);
+      scene.add(light);
+      var material = new THREE.MeshPhongMaterial({color: 'fffff'});
+      // Load in the mesh and add it to the scene.
+      var loader = new THREE.JSONLoader();
+      loader.load( "models/treehouse_logo.js", function(geometry){
+        //Put model in scene. Add Mesh to Model. Takes a bunch of different Mesh styles. Look up three.js docs.
+        mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+      });
+
+      //this creates the cube. then adds the variable material we created up there ^^ and passes it in for the color.
+      cube = new THREE.Mesh( new THREE.CubeGeometry( 5, 5, 5 ), material );
+      //This sets the cubes position in relation to the y 0 index of the scene.
+      cube.position.y = 5;
+      cube.position.x = 5;
+
+      scene.add( cube );
+
+
+      geom = new THREE.Geometry();
+      var v1 = new THREE.Vector3(0,0,0);
+      var v2 = new THREE.Vector3(50,0,0);
+      var v3 = new THREE.Vector3(50,0,50);
+      var v4 = new THREE.Vector3(0,0,50);
+      v5 = new THREE.Vector3(25,25,25);
+
+      geom.vertices.push(v1);
+      geom.vertices.push(v2);
+      geom.vertices.push(v3);
+      geom.vertices.push(v4);
+      geom.vertices.push(v5);
+
+      geom.faces.push( new THREE.Face3( 0, 1, 2), new THREE.Face3( 0, 2, 3), new THREE.Face3( 1, 2, 4), new THREE.Face3( 0, 1, 4), new THREE.Face3( 0, 3, 4), new THREE.Face3( 2, 3, 4) );
+      geom.computeFaceNormals();
+
+      material.side = THREE.DoubleSide;
+      object = new THREE.Mesh( geom, material );
+
+
+      scene.add(object);
+
+
+      // set up the sphere var
+
+      // create a new mesh with
+      // sphere geometry - we will cover
+      // the sphereMaterial next!
+      var sphere = new THREE.Mesh(new THREE.SphereGeometry(2, 2, 2), material);
+
+      // add the sphere to the scene
+      scene.add(sphere);
+
+      // Add OrbitControls so that we can pan around with the mouse.
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    }
+
+    // Renders the scene and updates the render as needed.
+    function animate() {
+
+      requestAnimationFrame(animate);
+
+      // cube.rotation.x += 0.1;
+      // cube.rotation.y += 0.1;
+      cube.rotation.z += 0.1;
+      if (clicks) v5.y += 1;
+      geom.verticesNeedUpdate = true;
+
+      // mesh.rotation.z += 0.1;
+      // Render the scene.
+      renderer.render(scene, camera);
+      controls.update();
+
+      object.position.z = 5;//move a bit back - size of 500 is a bit big
+      // object.rotation.y = -Math.PI * .5;//triangle is pointing in depth, rotate it -90 degrees on Y
+
+
+    }
+
+    var clicks;
+    $('canvas').on('click', function (){
+      clicks = true;
+
+    });
+
+    // $('canvas').on('mousemove', function (event){
+    //   console.log(event.clientX);
+    // });
+
+
+  </script>
+
+</body>
+</html>
