@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+      <title>Perlin noise | Fireball explosion</title>
+      <meta charset="utf-8">
+      <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  </head>
+
+  <body>
+  <h1>Webjam-01</h1>
+  <p class="play">Play</p>
+  <p class="stop">Stop</p>
+      <div id="container"></div>
+  </body>
+  <script src="js/audio.js"></script>
+
+  <script src="js/three.min.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  <script src="js/underscore-min.js"></script>
+  <script type="x-shader/x-vertex" id="vertexShader">
+    uniform float amplitude;
+    attribute float displacement;
+    varying vec3 vNormal;
+
+    void main() {
+
+      vNormal = normal;
+
+      // multiply our displacement by
+      // the amplitude. The amp will
+      // get animated so we'll have
+      // animated displacement
+      vec3 newPosition =
+        position + normal *
+        vec3(displacement);
+
+      gl_Position = projectionMatrix *
+                    modelViewMatrix *
+                    vec4(newPosition, 1.0);
+    }
+  </script>
+
+  <script type="x-shader/x-vertex" id="fragmentShader">
+    // same name and type as VS
+    varying vec3 vNormal;
+
+    void main() {
+
+      // calc the dot product and clamp
+      // 0 -> 1 rather than -1 -> 1
+      vec2 position;
+      vec3 light = vec3(0.5, 0.2, 1.0);
+
+      // ensure it's normalized
+      light = normalize(light);
+
+      // calculate the dot product of
+      // the light to the vertex normal
+      float dProd = max(0.0,
+                        dot(vNormal, light));
+
+      // feed into our frag colour
+      gl_FragColor = vec4(1.0 - dProd, // R
+                          dProd, // G
+                          dProd, // B
+                          1.0);  // A
+
+    }
+  </script>
+
+  <script type="text/javascript" id="mainCode">
+  // Put the main code
+  var container,
+  material,
+  renderer,
+  scene,
+  camera,
+  mesh,
+  fov = 30,
+  // create attributes for vertex shader
+  attributes = {
+    displacement: {
+      type: 'f',
+      value: []
+    }
+  },
+  uniforms = {
+    amplitude: {
+      type: 'f', // a float
+      value: 0
+    }
+  }
+
+  $(window).ready(function() {
+
+    // grab the container from the DOM
+    container = $("#container")[0];
+
+    // create a scene
+    scene = new THREE.Scene();
+
+    // create a camera the size of the browser window
+    // and place it 100 units away, looking towards the center of the scene
+    camera = new THREE.PerspectiveCamera(
+        fov,
+        window.innerWidth / window.innerHeight,
+        1,
+        10000 );
+    camera.position.z = 1000;
+    camera.target = new THREE.Vector3( 0, 0, 0 );
+
+    scene.add( camera );
+    // create a wireframe material
+    material = new THREE.ShaderMaterial( {
+      // uniforms: uniforms,
+      attributes: attributes,
+      vertexShader: $('#vertexShader').text(),
+      fragmentShader: $('#fragmentShader').text()
+    });
+
+    // create a sphere and assign the material
+    mesh = new THREE.Mesh(
+        new THREE.IcosahedronGeometry( 20, 4 ),
+        material
+    );
+
+    var verts = mesh.geometry.vertices; 
+    for (var v = 0; v < verts.length; v++) {
+      attributes.displacement.value.push(_.random(0,30));
+    }
+
+    mesh.dynamic = true;
+    // create the renderer and attach it to the DOM
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    container.appendChild( renderer.domElement );
+    scene.add( mesh );
+    render();
+
+    var frame = 0;
+
+    function render() {
+      // frame++;
+      // mesh.rotation.x += _.random(-.1,.1);
+      // mesh.rotation.y += _.random(-.1,.1);
+      attributes.displacement.needsUpdate = true;
+      var values = attributes.displacement.value;
+      var frequencies = getFrequencies();
+      // Trying to find where pulse comes from
+      // var maxFreq = [];
+      // for (var index in frequencies) {
+      //   frequency = frequencies[index];
+      //   if (frequency = 255) maxFreq.push(index);
+      // }
+
+      // Update vertices to bucket
+      for (var v = 0; v < verts.length; v++) {
+        attributes.displacement.value[v] = frequencies[(v + frame) % frequencies.length];
+      }
+      // let there be light
+      renderer.render( scene, camera );
+      requestAnimationFrame( render );
+      controls.update();
+    }
+
+    var timerId;
+
+    $(document).ready(function() {
+      $(".stop").on('click', function() {
+        audio0.pause();
+        audio0.currentTime = 0;
+        // Stops the frequency data from being returned.
+        clearInterval(timerId);
+      });
+
+      var samplerID = null;
+      $(".play").on('click', function() {
+        audio0.play();
+        beginVisualiser();
+        console.log('click');
+      });
+
+      $('body').on('click', function(){
+        attributes.displacement['needsUpdate'] = true;
+        console.log('clicked');
+        attributes.displacement.value.push(_.random(0,30));
+        console.log(attributes)
+      })
+    });
+  } );
+
+  </script>
+
+</html>
