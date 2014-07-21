@@ -4,6 +4,7 @@
       <title>Perlin noise | Fireball explosion</title>
       <meta charset="utf-8">
       <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <link rel="stylesheet" href="assets/style.css">
   </head>
 
   <body>
@@ -43,7 +44,7 @@
   <script type="x-shader/x-vertex" id="fragmentShader">
     // same name and type as VS
     varying vec3 vNormal;
-
+    uniform float red, green, blue;
     void main() {
 
       // calc the dot product and clamp
@@ -56,13 +57,13 @@
 
       // calculate the dot product of
       // the light to the vertex normal
-      float dProd = max(0.0,
-                        dot(vNormal, light));
+      float dProd =
+                        dot(vNormal, light);
 
       // feed into our frag colour
-      gl_FragColor = vec4(1.0 - dProd, // R
-                          dProd, // G
-                          dProd, // B
+      gl_FragColor = vec4(red - dProd, // R
+                          green - dProd, // G
+                          blue - dProd, // B
                           1.0);  // A
 
     }
@@ -85,7 +86,15 @@
     }
   },
   uniforms = {
-    amplitude: {
+    red: {
+      type: 'f', // a float
+      value: 0
+    },
+    green: {
+      type: 'f', // a float
+      value: 0
+    },
+    blue: {
       type: 'f', // a float
       value: 0
     }
@@ -112,11 +121,13 @@
     scene.add( camera );
     // create a wireframe material
     material = new THREE.ShaderMaterial( {
-      // uniforms: uniforms,
+      uniforms: uniforms,
       attributes: attributes,
       vertexShader: $('#vertexShader').text(),
       fragmentShader: $('#fragmentShader').text()
     });
+
+
 
     // create a sphere and assign the material
     mesh = new THREE.Mesh(
@@ -130,6 +141,21 @@
     }
 
     mesh.dynamic = true;
+
+    var particleGeo = new THREE.Geometry();
+    // creating geometry for particles
+    for (i = 0; i < 20000; i++) {
+      var particleVert = new THREE.Vector3();
+      particleVert.x = _.random(-1000,1000);
+      particleVert.y = _.random(-1000,1000);
+      particleVert.z = _.random(-1000,1000)
+      particleGeo.vertices.push(particleVert);
+    }
+
+    particleMat = new THREE.ParticleBasicMaterial({size:5});
+    particles = new THREE.ParticleSystem(particleGeo, particleMat);
+    scene.add(particles);
+
     // create the renderer and attach it to the DOM
     renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
@@ -140,23 +166,43 @@
 
     var frame = 0;
 
+
     function render() {
+      for(var index in particles.geometry.vertices) {
+        var particle = particles.geometry.vertices[index];
+        var x = particle.x;
+        var y = particle.y;
+        var z = particle.z;
+        particle.x += x/100;
+        particle.y += y/x/100;
+        particle.y += z/x;
+      }
+      particles.geometry.verticesNeedUpdate = true;
+      // particles.rotation.y += .001;
       // frame++;
       // mesh.rotation.x += _.random(-.1,.1);
       // mesh.rotation.y += _.random(-.1,.1);
       attributes.displacement.needsUpdate = true;
       var values = attributes.displacement.value;
-      var frequencies = getFrequencies();
+      var TimeDomain = getTimeDomain();
+      var frequency = getFrequencies();
+      var red = frequency[5]/255;
+      var green = frequency[7]/255;
+      var blue = frequency[10]/255;
+      particleMat.color = {r: 1, g: green, b: blue};
+      uniforms.red.value = red;
+      uniforms.green.value = green;
+      uniforms.blue.value = blue;
       // Trying to find where pulse comes from
       // var maxFreq = [];
-      // for (var index in frequencies) {
-      //   frequency = frequencies[index];
+      // for (var index in TimeDomain) {
+      //   frequency = TimeDomain[index];
       //   if (frequency = 255) maxFreq.push(index);
       // }
-
+      // console.log(TimeDomain)
       // Update vertices to bucket
       for (var v = 0; v < verts.length; v++) {
-        attributes.displacement.value[v] = frequencies[(v + frame) % frequencies.length];
+        attributes.displacement.value[v] = TimeDomain[(v + frame) % TimeDomain.length];
       }
       // let there be light
       renderer.render( scene, camera );

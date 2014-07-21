@@ -4,10 +4,11 @@
 
   // Initialising the Analyser node object
   var analyser = context.createAnalyser();
+  var analyser1 = context.createAnalyser();
 
   // Setting the bin count(bands) of the analyser
   analyser.fftSize = 1024; // Number of bands will be this / 2.
-
+  analyser1.fftSize = 32;
 
   // creating an Audio object
   var audio0 = new Audio();
@@ -22,23 +23,24 @@
   // connecting the source to the analyser
   source.connect(analyser);
   // connecting the source & analyser to the speakers (destination)
-  analyser.connect(context.destination);
+  analyser.connect(analyser1);
+  analyser1.connect(context.destination);
 
 
   // 8 bit unsigned itenger Array, 0-255 values represent -1 to +1 (in audio terms)
-  var frequencyData = new Uint8Array(analyser.frequencyBinCount);
-  var timeDomainData = new Uint8Array(12);
+  var timeDomainData = new Uint8Array(analyser.frequencyBinCount);
+  var frequencyData = new Uint8Array(analyser1.frequencyBinCount);
   // Function that receives & returns the frequencyData
   var getFrequencies = function() {
     // put data from getByteFrequencyData passed in array
-    analyser.getByteFrequencyData(frequencyData);
+    analyser1.getByteFrequencyData(frequencyData);
     return frequencyData;
   }
 
   var getTimeDomain = function() {
     // put data from getByteFrequencyData passed in array
-    analyser.getByteTimeDomainData(frequencyData);
-    return frequencyData;
+    analyser.getByteTimeDomainData(timeDomainData);
+    return timeDomainData;
   }
 
 

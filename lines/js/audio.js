@@ -30,27 +30,9 @@
 
   // Function that receives & returns the frequencyData
   var getFrequencies = function() {
-    // passing the frequency data array
-    analyser.getByteFrequencyData(frequencyData);
-
+    // put data from getByteFrequencyData passed in array
+    analyser.getByteTimeDomainData(frequencyData);
     return frequencyData;
   }
 
 
-$(document).ready(function() {
-  $(".stop").on('click', function() {
-    audio0.pause();
-    audio0.currentTime = 0;
-    // Stops the frequency data from being returned.
-    clearInterval(samplerID);
-  });
-
-  var samplerID = null;
-  $(".play").on('click', function() {
-    audio0.play();
-    samplerID = window.setInterval(function() {
-      // Calls getFrequencies, and sets an interval rate.
-      console.log(getFrequencies());
-    }, 1);
-  });
-});

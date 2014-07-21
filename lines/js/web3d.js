@@ -1,8 +1,6 @@
 // Set up the scene, camera, and renderer as global variables.
 var scene, camera, renderer;
-
-var lines = [];
-
+var lines = []; //Global array for animated elements
 // Sets up the scene.
 function init() {
 
@@ -13,7 +11,7 @@ function init() {
   var mesh;
   // Create a renderer and add it to the DOM.
   renderer = new THREE.WebGLRenderer({antialias:true});
-  renderer.shadowMapEnabled = true;
+  renderer.shadowMapEnabled = true; //Needs to be enabled for shadows
   renderer.setSize(WIDTH, HEIGHT);
   document.body.appendChild(renderer.domElement);
 
@@ -41,10 +39,6 @@ function init() {
 
   // Set the background color of the scene.
   renderer.setClearColorHex(0x333F47, 1);
-
-
-  // var material = new THREE.MeshPhongMaterial({color: 0xe600ff});
-  // Load in the mesh and add it to the scene.
 
   //making the light factory
   var lightFactory = function(x,y,z) {
@@ -80,7 +74,8 @@ var verticesFactory = function(x, y) {
 var lineFactory = function(r, g, b, vertexArray) {
   var lineMaterial = new THREE.LineBasicMaterial({
     // color: "rgb("+r+","+g+","+b+")"
-    color: "rgb("+r+","+g+","+b+")"
+    color: "rgb("+r+","+g+","+b+")",
+    linewidth: 5
   });
 
   var lineGeometry = new THREE.Geometry();
@@ -122,17 +117,37 @@ function random0255() {
 init();
 animate();
 
-var timer = setInterval(function(){
-    //lineFactory build at intervals
-    var freqPoints = [];
-    var freqArray = getFrequencies();
-    // Get data and build vertices
-    for (var i = 0; i < freqArray.length; i++) {
-      var amplitude = freqArray[i]/50;
-      var freqPoint = verticesFactory(i, amplitude);
-      freqPoints.push(freqPoint)
-    }
-    lineFactory(random0255(), random0255(), random0255(), freqPoints);
-  },
+// Create poll frequencies and create lines at set intervals
+var beginVisualiser = function() {
+  timerId = setInterval(function(){
+      //lineFactory build at intervals
+      var freqPoints = [];
+      var freqArray = getFrequencies();
+      // Get data and build vertices
+      for (var i = 0; i < freqArray.length; i++) {
+        var amplitude = freqArray[i]/20;
+        //Don't understand how this is making the default animation change before song starts
+        var freqPoint = verticesFactory((i-(freqArray.length)/2)*2, amplitude);
+        freqPoints.push(freqPoint)
+      }
+      lineFactory(random0255(), random0255(), random0255(), freqPoints);
+    },
   1);
-setTimeout(function(){clearInterval(timer)}, 10000);
+}
+
+var timerId;
+
+$(document).ready(function() {
+  $(".stop").on('click', function() {
+    audio0.pause();
+    audio0.currentTime = 0;
+    // Stops the frequency data from being returned.
+    clearInterval(timerId);
+  });
+
+  var samplerID = null;
+  $(".play").on('click', function() {
+    audio0.play();
+    beginVisualiser();
+  });
+});
