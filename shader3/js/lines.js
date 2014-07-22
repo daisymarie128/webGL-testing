@@ -3,6 +3,7 @@ function lines() {
   // var camera;
   var lines = []; //Global array for animated elements
   var lines2 = []; //Global array for animated elements
+  var colors = [[255,0,0],[0,230,255,],[0,255,85]];
   // Sets up the scene.
   function init() {
 
@@ -153,10 +154,10 @@ function lines() {
     }
 
   }
-  function random0255() {
-    return _.random(0,255);
-    // return parseInt(result);
-  }
+  // function random0255() {
+  //   return _.random(0,255);
+  //   // return parseInt(result);
+  // }
 
   init();
   animate();
