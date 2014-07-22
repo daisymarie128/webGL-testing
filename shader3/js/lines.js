@@ -14,7 +14,8 @@ function lines() {
     renderer = new THREE.WebGLRenderer({antialias:true});
     renderer.shadowMapEnabled = true; //Needs to be enabled for shadows
     renderer.setSize(WIDTH, HEIGHT);
-    document.body.appendChild(renderer.domElement);
+    $('#container').empty();
+    $('#container').append(renderer.domElement);
 
     //add fog to the scene. zoom in and out gets brighter and darker. delete if you want
     // scene.fog = new THREE.FogExp2( 0x000000, .0235 );
@@ -130,7 +131,5 @@ function lines() {
 
   init();
   animate();
-
-  // Create poll frequencies and create lines at set intervals
 
 }

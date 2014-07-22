@@ -106,7 +106,8 @@ function sunFlare() {// Put the main code
     // renderer.shadowMapEnabled = true;
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    container.appendChild( renderer.domElement );
+    $('#container').empty();
+    $('#container').append( renderer.domElement );
     scene.add( mesh );
     render();
 
@@ -150,9 +151,5 @@ function sunFlare() {// Put the main code
       requestAnimationFrame( render );
       controls.update();
     }
-
-    var timerId;
-
-
-  } );
+  });
 }
