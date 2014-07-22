@@ -11,6 +11,8 @@
   <h1>Webjam-01</h1>
   <p class="play">Play</p>
   <p class="stop">Stop</p>
+  <button id="sunflare">S</button>
+  <button id="lines">L</button>
       <div id="container"></div>
   </body>
   <script src="js/audio.js"></script>
@@ -85,11 +87,25 @@
   <script type="text/javascript">
     $(window).ready(function(){
       $(document).ready(function() {
-      $(".stop").on('click', function() {
-        audio0.pause();
-        audio0.currentTime = 0;
-        // Stops the frequency data from being returned.
+        $(".stop").on('click', function() {
+          audio0.pause();
+          audio0.currentTime = 0;
+          // Stops the frequency data from being returned.
+        });
+
+        var samplerID = null;
+        $(".play").on('click', function() {
+          audio0.play();
+          });
+        $('#lines').on('click',function(){
+          console.log('click')
+          lines();
+        })
+        $('#sunflare').click(function(){
+          sunFlare();
+        })
       });
+<<<<<<< HEAD
 
       var samplerID = null;
       $(".play").on('click', function() {
@@ -100,6 +116,9 @@
         // sunFlare();
         // renderer = null, scene = null;
         lines();
+=======
+      // call visualiser
+>>>>>>> 4d69a00258cc20184048fc69bf3fb3fa38842576
     });
   </script>
 
