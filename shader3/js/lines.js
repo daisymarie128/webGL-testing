@@ -1,7 +1,8 @@
 // Set up the scene, camera, and renderer as global variables.
 function lines() {
-  var camera;
+  // var camera;
   var lines = []; //Global array for animated elements
+  var lines2 = []; //Global array for animated elements
   // Sets up the scene.
   function init() {
 
@@ -23,7 +24,7 @@ function lines() {
     // .. Near(start rendering), Far (vanishing point? horizon line?))
     camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 0.1, 20000);
     //.PerspectiveCamera (zoom, )
-    camera.position.set(0,20,0);
+    camera.position.set(281.8632642777468, 12.830590608432118, 19.709799474934318);
     scene.add(camera);
 
     // Create an event listener that resizes the renderer with the browser window.
@@ -39,7 +40,7 @@ function lines() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     // Set the background color of the scene.
-    renderer.setClearColorHex(0x333F47, 1);
+    // renderer.setClearColorHex(0xfff, 1);
 
     //making the light factory
     var lightFactory = function(x,y,z) {
@@ -56,7 +57,7 @@ function lines() {
     var light3 = lightFactory( 0,100,100);
     // var light3 = lightFactory( 0,0,0);
 
-    var light = new THREE.HemisphereLight(0xfffff, 0xff0066, .5);
+    var light = new THREE.HemisphereLight(0xfffff, 0xfffff, .5);
     scene.add(light);
 
     // create lines
@@ -68,7 +69,7 @@ function lines() {
 
   // Vertices builder x,y,z where y amplitude passed in from frequency
   var verticesFactory = function(x, y) {
-    var vertex = new THREE.Vector3(x, y, 0)
+    var vertex = new THREE.Vector3(x, y, -100)
     return vertex;
   }
 
@@ -76,7 +77,7 @@ function lines() {
     var lineMaterial = new THREE.LineBasicMaterial({
       // color: "rgb("+r+","+g+","+b+")"
       color: "rgb("+r+","+g+","+b+")",
-      linewidth: 5
+      linewidth: 0.2
     });
 
     var lineGeometry = new THREE.Geometry();
@@ -97,13 +98,36 @@ function lines() {
     var freqArray = getTimeDomain();
     // Get data and build vertices
     for (var i = 0; i < freqArray.length; i++) {
-      var amplitude = freqArray[i]/20;
+      var amplitude = freqArray[i]/12;
       //Don't understand how this is making the default animation change before song starts
       var freqPoint = verticesFactory((i-(freqArray.length)/2)*2, amplitude);
       freqPoints.push(freqPoint)
     }
     lineFactory(random0255(), random0255(), random0255(), freqPoints);
   }
+
+  var cameraCheck = function (){
+  if (camera.position.y <= 15.788705886682353){
+    camera.position.y = 15.788705886682352;
+  }
+  if (camera.position.y >= 43.64040775696008){
+    camera.position.y = 43.6404077569600;
+  }
+  if (camera.position.x <= 277.39813827645145){
+    camera.position.x = 277.3981382764514;
+  }
+  if (camera.position.x >= 549.0749218863431){
+    camera.position.x = 549.074921886343;
+  }
+  if (camera.position.z >= 126.61507971732826){
+    camera.position.z = 126.6150797173282;
+  }
+  if (camera.position.z <= -38.54680380116381){
+    camera.position.z = -38.5468038011638;
+  }
+
+}
+
   // Renders the scene and updates the render as needed.
   function animate() {
     beginVisualiser();
@@ -111,13 +135,18 @@ function lines() {
 
     renderer.render(scene, camera);
     controls.update();
+    cameraCheck();
+
 
     for ( var i = 0; i< lines.length; i++){
       var line = lines[i];
-      line.position.z += 0.1;
+      line.position.x += 2.1;
+      line.position.x += 0.1;
+      line.position.z += 1.1;
+      // line.position.y += -0.1;
     }
 
-    if(lines.length > 50){
+    if(lines.length > 300){
       lastLine = lines.shift();
       scene.remove(lastLine);
     }
@@ -132,6 +161,6 @@ function lines() {
   animate();
 
   // Create poll frequencies and create lines at set intervals
-
 }
+
 
