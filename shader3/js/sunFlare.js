@@ -153,20 +153,6 @@ function sunFlare() {// Put the main code
 
     var timerId;
 
-    $(document).ready(function() {
-      $(".stop").on('click', function() {
-        audio0.pause();
-        audio0.currentTime = 0;
-        // Stops the frequency data from being returned.
-        clearInterval(timerId);
-      });
 
-      var samplerID = null;
-      $(".play").on('click', function() {
-        audio0.play();
-        beginVisualiser();
-        console.log('click');
-      });
-    });
   } );
 }
