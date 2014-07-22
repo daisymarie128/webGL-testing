@@ -25,7 +25,7 @@ function lines() {
     // .. Near(start rendering), Far (vanishing point? horizon line?))
     camera = new THREE.PerspectiveCamera(50, WIDTH / HEIGHT, 0.1, 20000);
     //.PerspectiveCamera (zoom, )
-    camera.position.set(281.8632642777468, 12.830590608432118, 19.709799474934318);
+    camera.position.set(281.5454554532732, 20.717505604326544, 19.709799474934318);
     scene.add(camera);
 
     // Create an event listener that resizes the renderer with the browser window.
@@ -99,7 +99,7 @@ function lines() {
     var freqArray = getTimeDomain();
     // Get data and build vertices
     for (var i = 0; i < freqArray.length; i++) {
-      var amplitude = freqArray[i]/12;
+      var amplitude = freqArray[i]/8;
       //Don't understand how this is making the default animation change before song starts
       var freqPoint = verticesFactory((i-(freqArray.length)/2)*2, amplitude);
       freqPoints.push(freqPoint)

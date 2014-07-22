@@ -107,7 +107,7 @@ function sunFlare() {// Put the main code
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     $('#container').empty();
-    $('#container').append( renderer.domElement );
+    $('#container').append(renderer.domElement);
     scene.add( mesh );
     render();
 
