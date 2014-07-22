@@ -84,6 +84,18 @@
   <script src="js/lines.js"></script>
   <script type="text/javascript">
     $(window).ready(function(){
+      $(document).ready(function() {
+      $(".stop").on('click', function() {
+        audio0.pause();
+        audio0.currentTime = 0;
+        // Stops the frequency data from being returned.
+      });
+
+      var samplerID = null;
+      $(".play").on('click', function() {
+        audio0.play();
+      });
+    });
       var scene, renderer;
         sunFlare();
         renderer = null, scene = null;
